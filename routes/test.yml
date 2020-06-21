@@ -1,0 +1,4 @@
+queue_name: test1
+consumed_by:
+  test:
+    path: "ENV_MICROSERVICE_TEST"
