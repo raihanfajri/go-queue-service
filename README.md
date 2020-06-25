@@ -14,4 +14,8 @@ How to run publisher
     cd publisher 
     go build && ./publisher
   
+How to run subscriber
+  
+    cd subscriber
+    go build && ./subscriber
   
