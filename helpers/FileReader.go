@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"fmt"
 	"io/ioutil"
 	"regexp"
 	"strings"
@@ -32,7 +31,6 @@ func getAllFilesPath(dir string, ext string, basePath string) []string {
 			filesPath = append(filesPath, basePath+strings.Replace(filename, ext, "", 1))
 		}
 
-		fmt.Println(file.Name())
 	}
 
 	return filesPath

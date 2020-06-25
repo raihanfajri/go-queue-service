@@ -2,11 +2,8 @@ package pub
 
 import (
 	"encoding/json"
-	"fmt"
-	"net"
-	"os"
-	"time"
 
+	rabbitmq "../config"
 	"github.com/streadway/amqp"
 )
 
@@ -25,77 +22,33 @@ func (p *RabbitMQ) Construct(queueId string, queueName string, configURL string,
 }
 
 func (p *RabbitMQ) Publish() (string, error) {
-	conn, err := connect()
+	qName := "queue"
+	r := &rabbitmq.Config{}
+	r.Initialize()
+
+	ch, m, err := r.Connect(qName)
 
 	if err != nil {
-		fmt.Println(err)
-
-		return "Failed to create rabbitmq connection", err
-	}
-
-	ch, err := conn.Channel()
-
-	if err != nil {
-		fmt.Println(err)
-
-		return "Failed to create rabbitmq channel", err
+		return m, err
 	}
 
 	defer ch.Close()
 
-	q, err := ch.QueueDeclare(
-		p.QueueName, // name
-		false,       // durable
-		false,       // delete when unused
-		false,       // exclusive
-		false,       // no-wait
-		nil,         // arguments
-	)
-
-	if err != nil {
-		fmt.Println(err)
-
-		return "Failed to declare queue", err
-	}
-
-	body, err := json.Marshal(p)
-
-	if err != nil {
-		fmt.Println(err)
-	}
+	body, _ := json.Marshal(p)
 
 	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
+		"",    // exchange
+		qName, // routing key
+		false, // mandatory
+		false, // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(body),
 		})
 
 	if err != nil {
-		fmt.Println(err)
-
 		return "Failed to publish rabbitmq message", err
 	}
 
 	return "Success sent message to rabbitmq. Message : " + string(body), nil
-}
-
-func connect() (*amqp.Connection, error) {
-	user := os.Getenv("RABBITMQ_USER")
-	password := os.Getenv("RABBITMQ_PASSWORD")
-	host := os.Getenv("RABBITMQ_HOST")
-	port := os.Getenv("RABBITMQ_PORT")
-
-	conenction := "amqp://" + user + ":" + password + "@" + host + ":" + port
-
-	conn, err := amqp.DialConfig(conenction, amqp.Config{
-		Dial: func(network, addr string) (net.Conn, error) {
-			return net.DialTimeout(network, addr, 2*time.Second)
-		},
-	})
-
-	return conn, err
 }

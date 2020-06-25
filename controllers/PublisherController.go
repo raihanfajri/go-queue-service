@@ -32,7 +32,7 @@ func (p *PubController) Handle(w http.ResponseWriter, r *http.Request) {
 		response.Success = false
 		code = 500
 		response.Message = "Internal Server Error"
-		helpers.LogError(err)
+		helpers.LogError(sentMessage, err)
 	}
 
 	response.SendJson(w, code)

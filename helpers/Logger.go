@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func LogError(err error) {
+func LogError(msg string, errMsg error) {
 	pathLog := "../logs"
 
 	_ = os.Mkdir(pathLog, 0700)
@@ -22,7 +22,8 @@ func LogError(err error) {
 
 	log.SetOutput(file)
 
-	log.Println(err)
+	log.Println(msg)
+	log.Println(errMsg)
 }
 
 func getTimeNow() string {

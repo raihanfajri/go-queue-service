@@ -16,12 +16,18 @@ func (p *PubService) PublishMessage(message string, url string) (string, error) 
 	_, err := helpers.ReadYML(filename, &yml)
 
 	if err != nil {
-		return "Error parsing", err
+		return "Error parsing YML", err
+	}
+
+	queueID, err := helpers.CreateQueueID()
+
+	if err != nil {
+		return "Failed to generate Queue ID", err
 	}
 
 	publisher := pub.GetPublisher()
 
-	publisher.Construct("2", yml.QueueName, url, message)
+	publisher.Construct(queueID.String(), yml.QueueName, url, message)
 
 	sentMessage, err := publisher.Publish()
 
